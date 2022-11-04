@@ -13,11 +13,9 @@ import (
 
 func main() {
   cmd := &cobra.Command{
-    Use: "Test",
+    Use: "findandreplace [flags] directory",
     Args: cobra.MinimumNArgs(1),
     Run: func(cmd *cobra.Command, args []string) {
-      fmt.Println("Running main")
-      fmt.Printf("flags: %v\nargs: %v\n", cmd.Flag("config").Value, args)
       run(cmd.Flag("config").Value.String(), args[0])
     },
   }
