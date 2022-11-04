@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/bmatcuk/doublestar/v4"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
@@ -37,14 +38,14 @@ func run(replaceYaml string, path string) {
 	}
 	for file, replaceMap := range data {
 		fmt.Printf("parsing filepattern %v\n", file)
-		fileResult, err := filepath.Glob(filepath.Join(path, file))
+		fileResult, err := doublestar.Glob(os.DirFS(path), file)
 		if err != nil {
 			log.Fatal("could not process file glob")
       continue
 		}
 		for _, res := range fileResult {
       fmt.Printf("Found file: %v\n", res)
-      fileContentBytes, err := os.ReadFile(res)
+      fileContentBytes, err := os.ReadFile(filepath.Join(path, res))
       if err != nil {
         log.Fatalf("error reading file: %v\n", res)
         continue
@@ -54,7 +55,7 @@ func run(replaceYaml string, path string) {
         fileContent = strings.ReplaceAll(fileContent, before, after)
 			}
       fmt.Println(fileContent)
-      os.WriteFile(filepath.Join(path, file), []byte(fileContent), os.ModePerm)
+      os.WriteFile(filepath.Join(path, res), []byte(fileContent), os.ModePerm)
 		}
 	}
 }

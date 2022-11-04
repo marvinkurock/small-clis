@@ -7,6 +7,8 @@ import (
 var replaceYaml = `"test.txt":
   doreplace: newcontent
 "test2.txt":
+  doreplace: newcontent
+"**/deep.txt":
   doreplace: newcontent`
 var replacetxt = "testcontent: doreplace"
 var noreplacetxt = "testcontent: donotreplace"
@@ -40,7 +42,23 @@ got:
 %s`, c)
     }
   })
+  t.Run("shoud replace deep.txt in root folder", func(t *testing.T) {
+    c, _ := os.ReadFile("test/deep.txt")
+    if string(c) != replacedContent {
+      t.Errorf(`deep.txt should have been replaced.
+got:
+%s`, c)
+    }
+  })
 
+  t.Run("shoud replace deep.txt in deep subfolders", func(t *testing.T) {
+    c, _ := os.ReadFile("test/child1/child2/cild3/deep.txt")
+    if string(c) != replacedContent {
+      t.Errorf(`deep.txt should have been replaced.
+got:
+%s`, c)
+    }
+  })
 
   // Cleanup
   os.RemoveAll("test")
@@ -48,9 +66,11 @@ got:
 }
 
 func createTestData() {
-	os.MkdirAll("test", os.ModePerm)
+	os.MkdirAll("test/child1/child2/cild3", os.ModePerm)
 	os.WriteFile("replace.yaml", []byte(replaceYaml), 0644)
 	os.WriteFile("test/test.txt", []byte(replacetxt), 0644)
 	os.WriteFile("test/testno.txt", []byte(replacetxt), 0644)
 	os.WriteFile("test/test2.txt", []byte(noreplacetxt), 0644)
+	os.WriteFile("test/child1/child2/cild3/deep.txt", []byte(replacetxt), 0644)
+	os.WriteFile("test/deep.txt", []byte(replacetxt), 0644)
 }
