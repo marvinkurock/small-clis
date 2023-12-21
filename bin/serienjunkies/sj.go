@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/mkurock/clis/pkg/color"
 	"github.com/spf13/cobra"
 )
 
@@ -31,7 +32,6 @@ func main() {
 		Use:   "sj",
 		Short: "sj is a simple serienjunkies query cli",
 		Run: func(cmd *cobra.Command, args []string) {
-			println("cmd: ", filter)
 			getData()
 		},
 	}
@@ -65,6 +65,7 @@ func getData() {
 		i.Season = s
 		i.Episode = e
 		i.Type = t
+		i.Name = strings.ReplaceAll(i.Name, ".", " ")
 		result = append(result, i)
 	}
 	for _, i := range result {
@@ -88,18 +89,12 @@ func parseName(name string) (string, int, int) {
 
 func prettyPrintItem(i Item) {
 	if i.Type == "Show" {
-		// 31 = red
-		// 32 = green
-		// 33 = yellow
-		// 34 = blue
-		// 35 = magenta
-		// 0 = reset
 		resolutionFix := 5 - len(i.Resolution)
 		padding := strings.Repeat(" ", resolutionFix)
 		if i.Episode == 0 {
-			fmt.Printf("[\033[35m%v\x1b[0m]  [\033[31m%v\x1b[0m]%v (Season \033[33m%v\x1b[0m)\t %v\n", "Season", i.Resolution, padding, i.Season, i.Name)
+			fmt.Printf("[%v]  [%v]%v (Season %v)\t %v\n", color.Magenta("Season"), color.Red(i.Resolution), padding, i.Season, i.Name)
 		} else {
-			fmt.Printf("[\033[32m%v\x1b[0m] [\033[31m%v\x1b[0m]%v (S\033[34m%v\x1b[0m E\033[34m%v\x1b[0m)\t %v\n", "Episode", i.Resolution, padding, i.Season, i.Episode, i.Name)
+			fmt.Printf("[%v] [%v]%v (S%v E%v)\t %v\n", color.Green("Episode"), color.Red(i.Resolution), padding, color.Blue(strconv.Itoa(i.Season)), color.Blue(strconv.Itoa(i.Episode)), i.Name)
 		}
 	} else {
 		fmt.Printf("[%v] %v\n", i.Type, i.Name)
