@@ -68,6 +68,7 @@ func getData() {
 		i.Name = strings.ReplaceAll(i.Name, ".", " ")
 		result = append(result, i)
 	}
+	printHeader()
 	for _, i := range result {
 		prettyPrintItem(i)
 	}
@@ -85,6 +86,11 @@ func parseName(name string) (string, int, int) {
 		t = "Show"
 	}
 	return t, season, episode
+}
+
+func printHeader() {
+	fmt.Printf("\033[1mType      Quality Season\t Title\033[0m\n")
+	fmt.Println("----------------------------------------------------------------------------------------------------")
 }
 
 func prettyPrintItem(i Item) {
